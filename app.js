@@ -1,10 +1,13 @@
 const express = require("express");
 const fs = require("fs");
+const morgan = require("morgan");
+
 const app = express();
 
 // ==============================
 // Express middleware layer
 // ==============================
+app.use(morgan("dev"));
 app.use(express.json());
 app.use((req, res, next) => {
   console.log("This is a middleware 👋");
@@ -126,7 +129,7 @@ app
 // =================================
 
 // app.use((req, res, next) => {
-//   console.log("This is a middleware 👋, runs for some apiZ only 😘");
+// console.log("This is a middleware 👋, runs for some apiZ only 😘");
 //   next();
 // });
 
