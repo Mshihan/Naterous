@@ -9,10 +9,10 @@ const app = express();
 // ==============================
 app.use(morgan("dev"));
 app.use(express.json());
-app.use((req, res, next) => {
-  console.log("This is a middleware 👋");
-  next();
-});
+// app.use((req, res, next) => {
+//   console.log("This is a middleware 👋");
+//   next();
+// });
 
 // ==============================
 // Json file read to sync
@@ -108,21 +108,77 @@ const deleteTour = (req, res) => {
 // =================================
 
 // app.get("/api/v1/tours", getTours);
-// app.post("/api/v1/tours", createTour);
-// app.get("/api/v1/tours/:id", getTour);
-// app.patch("/api/v1/tours/:id", updateTour);
-// app.delete("/api/v1/tours/:id", deleteTour);
+
+const getUsers = (req, res) => {
+  res.status(200).json({
+    status: "success",
+    message: "This route is not defined yet",
+    body: requestBody,
+  });
+};
+const getUser = (req, res) => {
+  res
+    .status(200)
+    .json({ status: "success", message: "This route is not defined yet" });
+};
+const createUser = (req, res) => {
+  res
+    .status(500)
+    .json({ status: "success", message: "This route is not defined yet" });
+};
+const updateUser = (req, res) => {
+  res
+    .status(500)
+    .json({ status: "success", message: "This route is not defined yet" });
+};
+const deleteUser = (req, res) => {
+  res
+    .status(500)
+    .json({ status: "success", message: "This route is not defined yet" });
+};
+
+// =================================
+// Separate Routes accordingly
+// =================================
+
+const tourRouter = express.Router();
+const userRouter = express.Router();
+
+tourRouter.route("/").get(getTours).post(createTour);
+tourRouter.route("/:id").get(getTour).patch(updateTour).delete(deleteTour);
+
+userRouter.route("/api/v1/users").get(getUsers).post(createUser);
+userRouter
+  .route("/api/v1/users/:id")
+  .get(getUser)
+  .patch(updateUser)
+  .delete(deleteUser);
+
+app.use("/api/v1/tours", tourRouter);
+app.use("/api/v1/users", userRouter);
+
+const port = 3000;
+app.listen(port, () => {
+  console.log(`Listening on port ${port}......`);
+});
 
 // =================================
 // Routes advanced
 // =================================
 
-app.route("/api/v1/tours").get(getTours).post(createTour);
-app
-  .route("/api/v1/tours/:id")
-  .get(getTour)
-  .patch(updateTour)
-  .delete(deleteTour);
+// app.route("/api/v1/tours").get(getTours).post(createTour);
+// app
+//   .route("/api/v1/tours/:id")
+//   .get(getTour)
+//   .patch(updateTour)
+//   .delete(deleteTour);
+
+// app.route("/api/v1/users").get(getUsers).post(createUser);
+// app
+//   .route("/api/v1/users/:id")
+//   .get(getUser)
+//   .patch(updateUser)
+//   .delete(deleteUser);
 
 // =================================
 // Conditional Middlewares
@@ -132,11 +188,6 @@ app
 // console.log("This is a middleware 👋, runs for some apiZ only 😘");
 //   next();
 // });
-
-const port = 3000;
-app.listen(port, () => {
-  console.log(`Listening on port ${port}......`);
-});
 
 // ==============================
 // API request tutorial
