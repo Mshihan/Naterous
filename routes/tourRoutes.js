@@ -1,17 +1,13 @@
 const express = require("express");
-const fs = require("fs");
 const tourRoutes = require("../controllers/tourControllers");
 
-// ==============================
-// Json file read to sync
-// ==============================
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
-);
-
 const router = express.Router();
+router.param("id", tourRoutes.checkID);
 
-router.route("/").get(tourRoutes.getTours).post(tourRoutes.createTour);
+router
+  .route("/")
+  .get(tourRoutes.getTours)
+  .post(tourRoutes.checkBody, tourRoutes.createTour);
 router
   .route("/:id")
   .get(tourRoutes.getTour)
