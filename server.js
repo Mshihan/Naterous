@@ -13,27 +13,23 @@ mongoose.connect(DB).then(() => {
   console.log("Successfuly connected to database.....");
 });
 
-// Mongoose Schema Configuration
-const tourSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, "A tour must have a name"],
-    unique: true,
-  },
-  rating: {
-    type: Number,
-    default: 4.5,
-  },
-  price: {
-    type: Number,
-    required: [true, "A tour must have a price"],
-  },
-});
-
-// Mongoose Model
-const Tour = mongoose.model("Tour", tourSchema);
-
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Listening on port ${port}......`);
 });
+
+// const testTour = new Tour({
+//   name: "The Forest figter",
+//   rating: 4.8,
+//   price: 450,
+// });
+
+// testTour
+//   .save()
+//   .then((instence) => {
+//     console.log("Successfuly saved");
+//     console.log(instence);
+//   })
+//   .catch((err) => {
+//     console.log(err);
+//   });
