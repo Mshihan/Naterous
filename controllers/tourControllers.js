@@ -244,9 +244,6 @@ exports.getTourStats = async (req, res, next) => {
       {
         $sort: { minPrice: 1 },
       },
-      {
-        $match: { _id: { $ne: "EASY" } },
-      },
     ]);
 
     res.status(200).json({
