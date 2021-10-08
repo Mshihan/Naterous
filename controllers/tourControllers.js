@@ -177,7 +177,8 @@ exports.updateTour = async (req, res) => {
 // }
 
 exports.deleteTour = async (req, res) => {
-  res.status(200).json({ status: "success", data: null });
+  const tour = await Tour.findByIdAndDelete(req.params.id);
+  res.status(200).json({ status: "success", data: tour });
 };
 
 // const fs = require("fs");
@@ -284,6 +285,9 @@ exports.getMonthlyPlan = async (req, res) => {
 
           tours: { $push: "$name" },
         },
+      },
+      {
+        $project: { _id: 0 },
       },
       {
         $sort: {
