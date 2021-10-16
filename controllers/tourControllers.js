@@ -89,13 +89,21 @@ exports.getTours = async (req, res) => {
 exports.getTour = async (req, res) => {
   try {
     const tour = await Tour.findById(req.params.id);
+    console.log(tour);
     // Tour.find({_id: req.params.id})
-    res.status(200).json({
-      status: "success",
-      data: {
-        tour,
-      },
-    });
+    if (tour) {
+      res.status(200).json({
+        status: "success",
+        data: {
+          tour,
+        },
+      });
+    } else {
+      res.status(200).json({
+        status: "fail",
+        message: "Unable to get the tour",
+      });
+    }
   } catch (err) {
     res.status(400).json({
       status: "Fail",
