@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const slugify = require("slugify");
 // Mongoose Schema Configuration
 const tourSchema = new mongoose.Schema(
   {
