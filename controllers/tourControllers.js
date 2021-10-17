@@ -59,9 +59,9 @@ exports.updateTour = catchAsync(async (req, res) => {
     new: true,
     runValidators: true,
   });
-  if (!tour) {
-    return next(new AppError("Undable to find the tour id", 404));
-  }
+  // if (!tour) {
+  //   return next(new AppError("Undable to find the tour id", 404));
+  // }
   res.status(200).json({
     status: "success",
     data: {

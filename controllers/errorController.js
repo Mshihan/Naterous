@@ -11,6 +11,12 @@ const handleDuplicateNameErrorDB = (err) => {
   return new AppError(message, 400);
 };
 
+const handleValidationErrorDB = (err) => {
+  const errors = Object.values(err.errors).map((el) => el.message);
+
+  return new AppError(`Validation data error. ${errors.join(", ")}`, 400);
+};
+
 const sendErrorProd = (err, res) => {
   if (err.isOperational) {
     res.status(err.statusCode).json({
@@ -45,6 +51,9 @@ module.exports = (err, req, res, next) => {
     }
     if (err.code === 11000) {
       error = handleDuplicateNameErrorDB(error);
+    }
+    if (err._message === "Validation failed") {
+      error = handleValidationErrorDB(error);
     }
     sendErrorProd(error, res);
   } else if (process.env.NODE_ENV === "development") {
