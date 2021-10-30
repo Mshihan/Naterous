@@ -33,6 +33,14 @@ const userSchema = new mongoose.Schema({
   },
 });
 
+// Static user methods
+userSchema.methods.correctPassword = async function (
+  candidatePassword,
+  userPassword
+) {
+  return bcrypt.compare(candidatePassword, userPassword);
+};
+
 // Schema document middlewares
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();

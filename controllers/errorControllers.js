@@ -31,6 +31,16 @@ const sendErrorProd = (err, res) => {
   }
 };
 
+const handleWebTokenExpiredError = (error) => {
+  const message = "Token Expired. Please login again.";
+  return new AppError(message, 401);
+};
+
+const handleWebTokenError = (error) => {
+  const message = "Invalid web token. Please login and retry";
+  return new AppError(message, 401);
+};
+
 const sendErrorDev = (err, res) => {
   res.status(err.statusCode).json({
     status: err.status,
@@ -54,6 +64,12 @@ module.exports = (err, req, res, next) => {
     }
     if (err._message === "Validation failed") {
       error = handleValidationErrorDB(error);
+    }
+    if (err.name === "JsonWebTokenError") {
+      error = handleWebTokenError(error);
+    }
+    if (err.name === "TokenExpiredError") {
+      error = handleWebTokenExpiredError(error);
     }
     sendErrorProd(error, res);
   } else if (process.env.NODE_ENV === "development") {
