@@ -1,9 +1,9 @@
 const express = require("express");
 const morgan = require("morgan");
-const tourRouter = require("./routes/tourRoutes");
-const userRouter = require("./routes/userRoutes");
-const AppError = require("./utils/appError");
-const errorController = require("./controllers/errorControllers");
+const tourRouter = require("/app/routes/tourRoutes");
+const userRouter = require("/app/routes/userRoutes");
+const AppError = require("/app/utils/appError");
+const errorController = require("/app/controllers/errorControllers");
 const compression = require("compression");
 const app = express();
 
