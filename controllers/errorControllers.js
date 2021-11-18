@@ -1,4 +1,4 @@
-const AppError = require("../utils/AppError");
+const AppError = require("./../utils/AppError");
 
 const handleCastErrorDB = (err) => {
   const message = `Invalid ${err.path}: ${err.value}`;
@@ -12,9 +12,14 @@ const handleDuplicateNameErrorDB = (err) => {
 };
 
 const handleValidationErrorDB = (err) => {
-  const errors = Object.values(err.errors).map((el) => el.message);
+  const errors = Object.values(err.errors).map(
+    (el) => el.message
+  );
 
-  return new AppError(`Validation data error. ${errors.join(", ")}`, 400);
+  return new AppError(
+    `Validation data error. ${errors.join(", ")}`,
+    400
+  );
 };
 
 const sendErrorProd = (err, res) => {
@@ -37,7 +42,8 @@ const handleWebTokenExpiredError = (error) => {
 };
 
 const handleWebTokenError = (error) => {
-  const message = "Invalid web token. Please login and retry";
+  const message =
+    "Invalid web token. Please login and retry";
   return new AppError(message, 401);
 };
 
