@@ -1,6 +1,6 @@
 const express = require("express");
-const userControllers = require("./../controllers/userControllers");
-const authControllers = require("./../controllers/authControllers");
+const userControllers = require("/app/controllers/userControllers");
+const authControllers = require("/app/controllers/authControllers");
 
 // =================================
 // Separate Routes accordingly

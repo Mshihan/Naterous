@@ -2,10 +2,10 @@
 // Get request to send all tours
 // ==============================
 
-const Tour = require("./../models/tourModel");
-const ApiFeatures = require("./../utils/apiFeatures");
-const catchAsync = require("./../utils/catchAsync");
-const AppError = require("./../utils/appError");
+const Tour = require("/app/models/tourModel");
+const ApiFeatures = require("/app/utils/apiFeatures");
+const catchAsync = require("/app/utils/catchAsync");
+const AppError = require("/app/utils/appError");
 
 exports.getTours = catchAsync(async (req, res) => {
   // Execute Query
