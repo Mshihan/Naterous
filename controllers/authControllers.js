@@ -1,9 +1,9 @@
-const User = require("/app/models/userModel");
-const catchAsync = require("/app/utils/catchAsync");
-const sendEmail = require("/app/utils/email");
+const User = require("./../models/userModel");
+const catchAsync = require("../utils/catchAsync");
+const sendEmail = require("../utils/email");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
-const AppError = require("/app/utils/appError");
+const AppError = require("./../utils/appError");
 const { promisify } = require("util");
 
 const signToken = (id) => {
