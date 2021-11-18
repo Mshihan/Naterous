@@ -4,6 +4,7 @@ const tourRouter = require("./routes/tourRoutes");
 const userRouter = require("./routes/userRoutes");
 const AppError = require("./utils/appError");
 const errorController = require("./controllers/errorControllers");
+const compression = require("compression");
 const app = express();
 
 // ==============================
@@ -14,6 +15,8 @@ if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
   //   console.log(process.env.NODE_ENV);
 }
+
+app.use(compression());
 app.use(express.json());
 app.use(express.static(`${__dirname}/public`));
 
@@ -33,7 +36,11 @@ app.all("*", (req, res, next) => {
   // const err = new Error(`Can't find ${req.originalUrl} on the server`);
   // err.statusCode = 404;
   // err.status = "error";
-  next(new AppError(`Can't find ${req.originalUrl} on the server`));
+  next(
+    new AppError(
+      `Can't find ${req.originalUrl} on the server`
+    )
+  );
 });
 
 app.use(errorController);
