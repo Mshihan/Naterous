@@ -19,7 +19,7 @@ router
 
 router
   .route("/")
-  .get(userControllers.getUsers)
+  .get(userControllers.getAllUsers)
   .post(userControllers.createUser);
 router
   .route("/:id")
