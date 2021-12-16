@@ -12,6 +12,17 @@ const signToken = (id) => {
   });
 };
 
+const sendCreateToken = (user, statusCode, res) => {
+  const token = signToken(user._id);
+  res.status(statusCode).json({
+    status: "success",
+    token,
+    data: {
+      user,
+    },
+  });
+};
+
 exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create({
     name: req.body.name,
@@ -21,12 +32,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     passwordChangedAt: req.body.passwordChangedAt,
     role: req.body.role,
   });
-
-  const token = signToken(newUser._id);
-  res.status(201).json({
-    status: "success",
-    token,
-  });
+  sendCreateToken(newUser, 200, res);
 });
 
 // Can't execute the next method after sending the response.
@@ -43,9 +49,7 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   // 2) check if the user exists & password is correct
-  const user = await User.findOne({ email }).select(
-    "+password"
-  );
+  const user = await User.findOne({ email }).select("+password");
 
   if (
     !user ||
@@ -57,12 +61,8 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   // 3) if everything is ok, send the json web token
-  const token = signToken(user._id);
 
-  res.status(200).json({
-    status: "success",
-    token,
-  });
+  sendCreateToken(user, 200, res);
 });
 
 exports.protected = catchAsync(async (req, res, next) => {
@@ -131,94 +131,113 @@ exports.restrictTo = (...roles) => {
   };
 };
 
-exports.forgetPassword = catchAsync(
-  async (req, res, next) => {
-    // 1) Check if the email address exists
-    const user = await User.findOne({
-      email: req.body.email,
-    });
+exports.forgetPassword = catchAsync(async (req, res, next) => {
+  // 1) Check if the email address exists
+  const user = await User.findOne({
+    email: req.body.email,
+  });
 
-    if (!user) {
-      return next(
-        new AppError(
-          "There is no user with this email address. Please enter a valid email",
-          404
-        )
-      );
-    }
-    // 2) Creating a password reset token
-    const resetToken =
-      await user.createPasswordResetToken();
-    await user.save({ validateBeforeSave: false });
-
-    // 3) send it to user's email
-    const resetUrl = `${req.protocol}://${req.get(
-      "host"
-    )}/api/v1/users/resetPassword/${resetToken}`;
-
-    const message = `Forgot your password? Submit a PATCH request with your new password and password confirm to : ${resetUrl}.\nIf you didn't forget your password, Please ignore this email!`;
-
-    try {
-      await sendEmail({
-        email: user.email,
-        subject:
-          "Your password reset token (valid for 10 min)",
-        message,
-      });
-
-      res.status(200).json({
-        status: "success",
-        message: "Token sent to email!",
-      });
-    } catch (err) {
-      user.passwordResetToken = undefined;
-      user.passwordResetExpires = undefined;
-
-      await user.save({ validateBeforeSave: false });
-
-      next(
-        new AppError(
-          "There was an error sending the email. Try again later!",
-          500
-        )
-      );
-    }
+  if (!user) {
+    return next(
+      new AppError(
+        "There is no user with this email address. Please enter a valid email",
+        404
+      )
+    );
   }
-);
+  // 2) Creating a password reset token
+  const resetToken = await user.createPasswordResetToken();
+  await user.save({ validateBeforeSave: false });
 
-exports.resetPassword = catchAsync(
-  async (req, res, next) => {
-    // 1) Get user based on the token
-    const hashedToken = crypto
-      .createHash("sha256")
-      .update(req.params.token)
-      .digest("hex");
+  // 3) send it to user's email
+  const resetUrl = `${req.protocol}://${req.get(
+    "host"
+  )}/api/v1/users/resetPassword/${resetToken}`;
 
-    const user = await User.findOne({
-      passwordResetToken: hashedToken,
-      passwordResetExpires: { $gt: Date.now() },
+  const message = `Forgot your password? Submit a PATCH request with your new password and password confirm to : ${resetUrl}.\nIf you didn't forget your password, Please ignore this email!`;
+
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: "Your password reset token (valid for 10 min)",
+      message,
     });
-
-    // 2) If token has not expired, and there is user, set the new password
-    if (!user) {
-      return next(
-        new AppError("Token is invalid or has expired", 400)
-      );
-    }
-
-    // 3) Update changedPasswordAt property for the user
-    user.password = req.body.password;
-    user.passwordConfirm = req.body.passwordConfirm;
-    user.passwordResetToken = undefined;
-    user.passwordResetExpires = undefined;
-    await user.save();
-
-    // 4) Log the user in, send JWT
-    const token = signToken(user._id);
 
     res.status(200).json({
       status: "success",
-      token,
+      message: "Token sent to email!",
     });
+  } catch (err) {
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+
+    await user.save({ validateBeforeSave: false });
+
+    next(
+      new AppError(
+        "There was an error sending the email. Try again later!",
+        500
+      )
+    );
   }
-);
+});
+
+exports.resetPassword = catchAsync(async (req, res, next) => {
+  // 1) Get user based on the token
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(req.params.token)
+    .digest("hex");
+
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() },
+  });
+
+  // 2) If token has not expired, and there is user, set the new password
+  if (!user) {
+    return next(
+      new AppError("Token is invalid or has expired", 400)
+    );
+  }
+
+  // 3) Update changedPasswordAt property for the user
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+  await user.save();
+
+  // 4) Log the user in, send JWT
+  sendCreateToken(user, 200, res);
+});
+
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  // 1) Get user from collection
+  const user = await User.findById(req.user._id).select(
+    "+password"
+  );
+
+  // 2) Check if POSTed current password is correct
+
+  if (
+    !(await user.correctPassword(
+      req.body.passwordCurrent,
+      user.password
+    ))
+  ) {
+    return next(
+      new AppError(
+        "Your current password is not matched. Please provide the correct password",
+        401
+      )
+    );
+  }
+  //3) If so, update password
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  await user.save();
+
+  // 4) Log user in, send JWT token
+  sendCreateToken(user, 200, res);
+});
