@@ -1,10 +1,11 @@
 const express = require("express");
 const morgan = require("morgan");
+const rateLimit = require("express-rate-limit");
+const compression = require("compression");
 const tourRouter = require("./routes/tourRoutes");
 const userRouter = require("./routes/userRoutes");
 const AppError = require("./utils/appError");
 const errorController = require("./controllers/errorControllers");
-const compression = require("compression");
 const app = express();
 
 // ==============================
@@ -13,8 +14,16 @@ const app = express();
 
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
-  //   console.log(process.env.NODE_ENV);
 }
+
+const limiter = rateLimit({
+  max: 100,
+  windowMs: 60 * 60 * 1000,
+  message:
+    "Too many requests from this IP. Please try again in an hour",
+});
+
+app.use("/api", rateLimit);
 
 app.use(compression());
 app.use(express.json());
@@ -37,9 +46,7 @@ app.all("*", (req, res, next) => {
   // err.statusCode = 404;
   // err.status = "error";
   next(
-    new AppError(
-      `Can't find ${req.originalUrl} on the server`
-    )
+    new AppError(`Can't find ${req.originalUrl} on the server`)
   );
 });
 
