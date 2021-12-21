@@ -2,6 +2,10 @@ const express = require("express");
 const morgan = require("morgan");
 const rateLimit = require("express-rate-limit");
 const compression = require("compression");
+const hpp = require("hpp");
+const helmet = require("helmet");
+const xss = require("xss-clean");
+const mongoSanitizer = require("express-mongo-sanitize");
 const tourRouter = require("./routes/tourRoutes");
 const userRouter = require("./routes/userRoutes");
 const AppError = require("./utils/appError");
@@ -12,21 +16,50 @@ const app = express();
 // Express middleware layer
 // ==============================
 
+// Setting secure http headers
+app.use(helmet());
+
+// Check if the server is runing in development or production mode
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 
+//Limiting number of requests from same IP
 const limiter = rateLimit({
   max: 100,
   windowMs: 60 * 60 * 1000,
   message:
     "Too many requests from this IP. Please try again in an hour",
 });
+app.use("/api/", limiter);
 
-app.use("/api", rateLimit);
-
+// Compress the file that returns from the server
 app.use(compression());
-app.use(express.json());
+
+// Body parser, Reading data from body => req.body
+app.use(express.json({ limit: "10kb" }));
+
+// Prevernt from No SQL Injections
+app.use(mongoSanitizer());
+
+// Prevent XSS attacks
+app.use(xss());
+
+// Preventing HTTP Parameter pollution
+app.use(
+  hpp({
+    whitelist: [
+      "duration",
+      "ratingsQuantity",
+      "ratingsAverage",
+      "maxGroupSize",
+      "difficulty",
+      "price",
+    ],
+  })
+);
+
+// Serving static files from the server
 app.use(express.static(`${__dirname}/public`));
 
 // =================================
@@ -37,14 +70,6 @@ app.use("/api/v1/tours", tourRouter);
 app.use("/api/v1/users", userRouter);
 
 app.all("*", (req, res, next) => {
-  // res.status(200).json({
-  //   status: "fail",
-  //   message: `Can't find ${req.originalUrl} on the server`,
-  // });
-
-  // const err = new Error(`Can't find ${req.originalUrl} on the server`);
-  // err.statusCode = 404;
-  // err.status = "error";
   next(
     new AppError(`Can't find ${req.originalUrl} on the server`)
   );

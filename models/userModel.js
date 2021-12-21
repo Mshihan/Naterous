@@ -49,6 +49,29 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+
+  startLocation: {
+    //GeoJSON
+    type: {
+      type: String,
+      default: "Point",
+      enum: ["Point"],
+    },
+    coordinates: [Number],
+    address: String,
+    description: String,
+  },
+  locations: {
+    type: {
+      type: String,
+      default: "Point",
+      enum: ["Point"],
+    },
+    cordinates: [Number],
+    address: String,
+    description: String,
+    day: Number,
+  },
 });
 
 // Static user methods

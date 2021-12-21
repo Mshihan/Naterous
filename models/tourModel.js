@@ -23,7 +23,7 @@ const tourSchema = new mongoose.Schema(
       type: String,
       required: [true, "A tour must have a difficulty"],
       enum: {
-        values: ["easy", "hard", "medium"],
+        values: ["easy", "difficult", "medium"],
         message: "Difficulty is either hard, medium or easy",
       },
     },
@@ -79,7 +79,9 @@ tourSchema.virtual("durationWeeks").get(function () {
 });
 
 tourSchema.pre("aggregate", function (next) {
-  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+  this.pipeline().unshift({
+    $match: { secretTour: { $ne: true } },
+  });
   next();
 });
 
