@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const User = require("./userModel");
 // Mongoose Schema Configuration
 const tourSchema = new mongoose.Schema(
   {
@@ -62,11 +63,37 @@ const tourSchema = new mongoose.Schema(
       default: Date.now(),
       select: false,
     },
+    guides: Array,
     startDates: [Date],
     secretTour: {
       type: Boolean,
       default: false,
     },
+
+    startLocation: {
+      //GeoJSON
+      type: {
+        type: String,
+        default: "Point",
+        enum: ["Point"],
+      },
+      coordinates: [Number],
+      address: String,
+      description: String,
+    },
+    locations: [
+      {
+        type: {
+          type: String,
+          default: "Point",
+          enum: ["Point"],
+        },
+        cordinates: [Number],
+        address: String,
+        description: String,
+        day: Number,
+      },
+    ],
   },
   {
     toJSON: { virtuals: true },
@@ -82,6 +109,14 @@ tourSchema.pre("aggregate", function (next) {
   this.pipeline().unshift({
     $match: { secretTour: { $ne: true } },
   });
+  next();
+});
+
+tourSchema.pre("save", async function (next) {
+  const guidePromise = this.guides.map(
+    async (id) => await User.findById(id)
+  );
+  this.guides = await Promise.all(guidePromise);
   next();
 });
 

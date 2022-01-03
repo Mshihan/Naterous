@@ -12,6 +12,12 @@ const DB = process.env.DATABASE.replace(
 
 mongoose.connect(DB).then(() => {
   console.log("Successfuly connected to database.....");
+
+  if (process.argv[2] === "--import") {
+    importData();
+  } else if (process.argv[2] === "--delete") {
+    deleteData();
+  }
 });
 
 const tours = JSON.parse(
@@ -38,9 +44,3 @@ const deleteData = async () => {
     console.log("Deleting is failed");
   }
 };
-
-if (process.argv[2] === "--import") {
-  importData();
-} else if (process.argv[2] === "--delete") {
-  deleteData();
-}
