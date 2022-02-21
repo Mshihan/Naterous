@@ -6,6 +6,7 @@ const FactoryHandler = require("./factoryHandler");
 exports.getTourUserId = catchAsync(async (req, res, next) => {
   if (!req.body.tour) req.body.tour = req.params.tourId;
   if (!req.body.user) req.body.user = req.user.id;
+  next();
 });
 
 exports.getReviews = catchAsync(async (req, res) => {
