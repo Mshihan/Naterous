@@ -10,6 +10,7 @@ const tourRouter = require("./routes/tourRoutes");
 const userRouter = require("./routes/userRoutes");
 const AppError = require("./utils/appError");
 const errorController = require("./controllers/errorControllers");
+const userReviewRouter = require("./routes/reviewRoutes");
 const app = express();
 
 // ==============================
@@ -68,6 +69,7 @@ app.use(express.static(`${__dirname}/public`));
 
 app.use("/api/v1/tours", tourRouter);
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/reviews", userReviewRouter);
 
 app.all("*", (req, res, next) => {
   next(
