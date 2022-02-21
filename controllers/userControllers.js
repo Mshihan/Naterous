@@ -1,6 +1,7 @@
 const User = require("../models/userModel");
 const catchAsync = require("./../utils/catchAsync");
 const AppError = require("./../utils/appError");
+const FactoryHandler = require("./factoryHandler");
 
 // =================================
 // User handling controllers
@@ -80,15 +81,7 @@ exports.createUser = (req, res) => {
     message: "This route is not defined yet",
   });
 };
-exports.updateUser = (req, res) => {
-  res.status(200).json({
-    status: "success",
-    message: "This route is not defined yet",
-  });
-};
-exports.deleteUser = (req, res) => {
-  res.status(200).json({
-    status: "success",
-    message: "This route is not defined yet",
-  });
-};
+
+// Don't update the password.
+exports.updateUser = FactoryHandler.updateOne(User);
+exports.deleteUser = FactoryHandler.updateOne(User);

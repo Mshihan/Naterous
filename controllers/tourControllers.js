@@ -1,11 +1,8 @@
-// ==============================
-// Get request to send all tours
-// ==============================
-
 const Tour = require("../models/tourModel");
 const ApiFeatures = require("./../utils/apiFeatures");
 const catchAsync = require("./../utils/catchAsync");
 const AppError = require("./../utils/appError");
+const FactoryHandler = require("./factoryHandler");
 
 exports.getTours = catchAsync(async (req, res) => {
   // Execute Query
@@ -43,50 +40,9 @@ exports.getTour = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.createTour = catchAsync(async (req, res) => {
-  // const newTour = new Tour({});
-  // newTour.save();
-  const newTour = await Tour.create(req.body);
-  res.status(201).json({
-    status: "success",
-    data: {
-      newTour,
-    },
-  });
-});
-
-// =================================
-// Patch request to update the tours
-// =================================
-exports.updateTour = catchAsync(async (req, res) => {
-  const tour = await Tour.findByIdAndUpdate(
-    req.params.id,
-    req.body,
-    {
-      new: true,
-      runValidators: true,
-    }
-  );
-  // if (!tour) {
-  //   return next(new AppError("Undable to find the tour id", 404));
-  // }
-  res.status(200).json({
-    status: "success",
-    data: {
-      tour,
-    },
-  });
-});
-
-exports.deleteTour = catchAsync(async (req, res) => {
-  const tour = await Tour.findByIdAndDelete(req.params.id);
-  if (!tour) {
-    return next(
-      new AppError("Undable to find the tour id", 404)
-    );
-  }
-  res.status(200).json({ status: "success", data: tour });
-});
+exports.createTour = FactoryHandler.createOne(Tour);
+exports.updateTour = FactoryHandler.updateOne(Tour);
+exports.deleteTour = FactoryHandler.deleteOne(Tour);
 
 exports.getTourStats = catchAsync(async (req, res, next) => {
   const stats = await Tour.aggregate([

@@ -9,7 +9,9 @@ router
   .post(
     authRoutes.protected,
     authRoutes.restrictTo("user"),
+    reviewController.getTourUserId,
     reviewController.createReview
   );
+router.route("/:id").delete(reviewController.deleteReview);
 
 module.exports = router;
