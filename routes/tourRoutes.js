@@ -11,16 +11,28 @@ router.use("/:tourId/reviews", reviewRouter);
 
 router
   .route("/monthly-plan/:year")
-  .get(tourRoutes.getMonthlyPlan);
+  .get(
+    authRoutes.protected,
+    authRoutes.restrictTo("admin", "lead-guide"),
+    tourRoutes.getMonthlyPlan
+  );
 
 router
   .route("/")
-  .get(authRoutes.protected, tourRoutes.getTours)
-  .post(tourRoutes.createTour);
+  .get(tourRoutes.getTours)
+  .post(
+    authRoutes.protected,
+    authRoutes.restrictTo("admin", "lead-guide"),
+    tourRoutes.createTour
+  );
 router
   .route("/:id")
   .get(tourRoutes.getTour)
-  .patch(tourRoutes.updateTour)
+  .patch(
+    authRoutes.protected,
+    authRoutes.restrictTo("admin", "lead-guide"),
+    tourRoutes.updateTour
+  )
   .delete(
     authRoutes.protected,
     authRoutes.restrictTo("admin", "lead-guide"),

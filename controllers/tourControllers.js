@@ -1,45 +1,12 @@
 const Tour = require("../models/tourModel");
-const ApiFeatures = require("./../utils/apiFeatures");
 const catchAsync = require("./../utils/catchAsync");
 const AppError = require("./../utils/appError");
 const FactoryHandler = require("./factoryHandler");
 
-exports.getTours = catchAsync(async (req, res) => {
-  // Execute Query
-  const features = new ApiFeatures(Tour.find(), req.query)
-    .filter()
-    .sort()
-    .fieldLimit()
-    .pagination();
-  const result = await features.query;
-
-  res.status(200).json({
-    status: "success",
-    results: result.length,
-    data: {
-      result,
-    },
-  });
+exports.getTours = FactoryHandler.getAll(Tour);
+exports.getTour = FactoryHandler.getOne(Tour, {
+  path: "reviews",
 });
-
-exports.getTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findById(req.params.id).populate(
-    "reviews"
-  );
-
-  if (!tour) {
-    return next(
-      new AppError("Undable to find the tour id", 404)
-    );
-  }
-  res.status(200).json({
-    status: "success",
-    data: {
-      tour,
-    },
-  });
-});
-
 exports.createTour = FactoryHandler.createOne(Tour);
 exports.updateTour = FactoryHandler.updateOne(Tour);
 exports.deleteTour = FactoryHandler.deleteOne(Tour);

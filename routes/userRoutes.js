@@ -16,23 +16,21 @@ router
 router
   .route("/resetPassword/:token")
   .patch(authControllers.resetPassword);
+
+router.use(authControllers.protected);
+
 router
   .route("/updateMyPassword")
-  .patch(
-    authControllers.protected,
-    authControllers.updatePassword
-  );
+  .patch(authControllers.updatePassword);
 
-router.patch(
-  "/updateMe",
-  authControllers.protected,
-  userControllers.updateMe
+router.patch("/updateMe", userControllers.updateMe);
+router.delete("/deleteMe", userControllers.deleteMe);
+router.get(
+  "/Me",
+  userControllers.getMe,
+  userControllers.getUser
 );
-router.delete(
-  "/deleteMe",
-  authControllers.protected,
-  userControllers.deleteMe
-);
+router.use(authControllers.restrictTo("admin"));
 
 router
   .route("/")

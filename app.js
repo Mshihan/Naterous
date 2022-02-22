@@ -21,9 +21,9 @@ const app = express();
 app.use(helmet());
 
 // Check if the server is runing in development or production mode
-if (process.env.NODE_ENV === "development") {
-  app.use(morgan("dev"));
-}
+// if (process.env.NODE_ENV === "development") {
+app.use(morgan("dev"));
+// }
 
 //Limiting number of requests from same IP
 const limiter = rateLimit({

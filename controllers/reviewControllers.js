@@ -9,32 +9,32 @@ exports.getTourUserId = catchAsync(async (req, res, next) => {
   next();
 });
 
-exports.getReviews = catchAsync(async (req, res) => {
-  let filter = {};
-  if (req.params.tourId) filter = { tour: req.params.tourId };
-  const review = await Review.find(filter)
-    .populate({
-      path: "user",
-      select: "name photo",
-    })
-    .populate({
-      path: "tour",
-      select: "name",
-    });
+// exports.getReviews = catchAsync(async (req, res) => {
 
-  if (!review) {
-    return next(new AppError("Unable to find the review"));
-  }
+//   const review = await Review.find(filter)
+//     .populate({
+//       path: "user",
+//       select: "name photo",
+//     })
+//     .populate({
+//       path: "tour",
+//       select: "name",
+//     });
 
-  res.status(200).json({
-    status: "success",
-    length: review.length,
-    data: {
-      review,
-    },
-  });
-});
+//   if (!review) {
+//     return next(new AppError("Unable to find the review"));
+//   }
 
+//   res.status(200).json({
+//     status: "success",
+//     length: review.length,
+//     data: {
+//       review,
+//     },
+//   });
+// });
+exports.getReviews = FactoryHandler.getAll(Review);
+exports.getReview = FactoryHandler.getOne(Review);
 exports.createReview = FactoryHandler.createOne(Review);
 exports.updateReview = FactoryHandler.updateOne(Review);
 exports.deleteReview = FactoryHandler.deleteOne(Review);
