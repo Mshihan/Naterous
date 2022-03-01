@@ -12,6 +12,7 @@ const userRouter = require("./routes/userRoutes");
 const AppError = require("./utils/appError");
 const errorController = require("./controllers/errorControllers");
 const userReviewRouter = require("./routes/reviewRoutes");
+const viewRouter = require("./routes/viewRoutes");
 const app = express();
 
 app.set("view engine", "pug"); //set the view engine to pug
@@ -71,13 +72,7 @@ app.use(express.static(path.join(__dirname, "public")));
 // Routes
 // =================================
 
-app.get("/", (req, res) => {
-  res.status(200).render("base", {
-    tour: "The Forest Hiker",
-    user: "shihan",
-  });
-});
-
+app.use("/", viewRouter);
 app.use("/api/v1/tours", tourRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/reviews", userReviewRouter);

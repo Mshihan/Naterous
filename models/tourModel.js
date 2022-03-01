@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const User = require("./userModel");
+const slugify = require("slugify");
 // Mongoose Schema Configuration
 const tourSchema = new mongoose.Schema(
   {
@@ -119,6 +120,11 @@ tourSchema.virtual("reviews", {
   ref: "Review",
   foreignField: "tour",
   localField: "_id",
+});
+
+tourSchema.pre("save", function (next) {
+  this.slug = slugify(this.name, { lower: true });
+  next();
 });
 
 // tourSchema.pre("aggregate", function (next) {

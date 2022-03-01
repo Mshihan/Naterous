@@ -1,5 +1,6 @@
 {
-  "singleQuote": false,
-  "printWidth": 80,
-  "endOfLine": "auto"
+    "singleQuote": false,
+    "printWidth": 80,
+    "endOfLine": "auto",
+    "tabWidth": 2
 }
