@@ -17,8 +17,7 @@ const sendCreateToken = (user, statusCode, res) => {
 
   const cookieObj = {
     expires: new Date(
-      Date.now() +
-        process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
     ),
     httpOnly: true,
   };
@@ -62,21 +61,14 @@ exports.login = catchAsync(async (req, res, next) => {
 
   // 1) check if the email & password exists
   if (!email || !password) {
-    return next(
-      new AppError("Please provide email and password", 400)
-    );
+    return next(new AppError("Please provide email and password", 400));
   }
 
   // 2) check if the user exists & password is correct
   const user = await User.findOne({ email }).select("+password");
 
-  if (
-    !user ||
-    !(await user.correctPassword(password, user.password))
-  ) {
-    return next(
-      new AppError("Incorrect email or password", 401)
-    );
+  if (!user || !(await user.correctPassword(password, user.password))) {
+    return next(new AppError("Incorrect email or password", 401));
   }
 
   // 3) if everything is ok, send the json web token
@@ -91,6 +83,8 @@ exports.protected = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith("Bearer ")
   ) {
     token = req.headers.authorization.split(" ")[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
   }
 
   if (!token) {
@@ -103,10 +97,7 @@ exports.protected = catchAsync(async (req, res, next) => {
   }
 
   // Verification token
-  const decode = await promisify(jwt.verify)(
-    token,
-    process.env.JWT_SECRET
-  );
+  const decode = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
   // Check if the user is exists
   const currentUser = await User.findById(decode.id);
@@ -114,10 +105,7 @@ exports.protected = catchAsync(async (req, res, next) => {
   // Check if the user exists
   if (!currentUser) {
     return next(
-      new AppError(
-        "The user belonging to the token does not exist",
-        401
-      )
+      new AppError("The user belonging to the token does not exist", 401)
     );
   }
 
@@ -140,10 +128,7 @@ exports.restrictTo = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
       return next(
-        new AppError(
-          "You don't have permission to perform this acction",
-          403
-        )
+        new AppError("You don't have permission to perform this acction", 403)
       );
     }
     next();
@@ -215,9 +200,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
   // 2) If token has not expired, and there is user, set the new password
   if (!user) {
-    return next(
-      new AppError("Token is invalid or has expired", 400)
-    );
+    return next(new AppError("Token is invalid or has expired", 400));
   }
 
   // 3) Update changedPasswordAt property for the user
@@ -233,18 +216,11 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
   // 1) Get user from collection
-  const user = await User.findById(req.user._id).select(
-    "+password"
-  );
+  const user = await User.findById(req.user._id).select("+password");
 
   // 2) Check if POSTed current password is correct
 
-  if (
-    !(await user.correctPassword(
-      req.body.passwordCurrent,
-      user.password
-    ))
-  ) {
+  if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
     return next(
       new AppError(
         "Your current password is not matched. Please provide the correct password",

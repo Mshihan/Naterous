@@ -4,6 +4,7 @@ const morgan = require("morgan");
 const rateLimit = require("express-rate-limit");
 const compression = require("compression");
 const hpp = require("hpp");
+const cookieParser = require("cookie-parser");
 const helmet = require("helmet");
 const xss = require("xss-clean");
 const mongoSanitizer = require("express-mongo-sanitize");
@@ -43,6 +44,11 @@ app.use(compression());
 
 // Body parser, Reading data from body => req.body
 app.use(express.json({ limit: "10kb" }));
+app.use(cookieParser());
+
+app.use((req, res, next) => {
+  console.log(req.cookies);
+});
 
 // Prevernt from No SQL Injections
 app.use(mongoSanitizer());
