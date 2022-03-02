@@ -47,7 +47,8 @@ app.use(express.json({ limit: "10kb" }));
 app.use(cookieParser());
 
 app.use((req, res, next) => {
-  console.log(req.cookies);
+  // console.log(req.cookies);
+  next();
 });
 
 // Prevernt from No SQL Injections

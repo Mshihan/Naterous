@@ -1,13 +1,11 @@
 const locations = JSON.parse(document.getElementById("map").dataset.location);
-console.log(locations);
+
 mapboxgl.accessToken =
   "pk.eyJ1Ijoic25tc2loYW4iLCJhIjoiY2wwN3JkM3dxMDZ5NDNiazY2MWpsMzE0OCJ9.xlTcEE88UIBGuUtUapy5XA";
 const map = new mapboxgl.Map({
   container: "map", // container ID
   style: "mapbox://styles/snmsihan/cl07qtq96000b15m7knmcodiz", // style URL
   scrollZoom: false,
-  //   center: [-74.5, 40], // starting position [lng, lat]
-  //   zoom: 9, // starting zoom
 });
 
 const bounds = new mapboxgl.LngLatBounds();
