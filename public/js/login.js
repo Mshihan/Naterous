@@ -16,12 +16,26 @@ const login = async (email, password) => {
       },
     });
     if (res.data.status === "success") {
-      alert("Logged in successfully");
+      showAlert("success", "You are logged in");
       window.setTimeout(() => {
         location.assign("/");
       }, 1500);
     }
   } catch (err) {
-    alert(err.response.data.message);
+    showAlert("error", err.response.data.message);
   }
+};
+
+const hideAlert = () => {
+  const alert = document.querySelector(".alert");
+  if (alert) {
+    alert.parentElement.removeChild(alert);
+  }
+};
+
+const showAlert = (type, msg) => {
+  hideAlert();
+  const markup = `<div class="alert alert--${type}">${msg}</div>`;
+  document.querySelector("body").insertAdjacentHTML("afterbegin", markup);
+  window.setTimeout(hideAlert, 1000);
 };

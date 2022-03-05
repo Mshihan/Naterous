@@ -12,17 +12,45 @@ const handleDuplicateNameErrorDB = (err) => {
 };
 
 const handleValidationErrorDB = (err) => {
-  const errors = Object.values(err.errors).map(
-    (el) => el.message
-  );
+  const errors = Object.values(err.errors).map((el) => el.message);
 
-  return new AppError(
-    `Validation data error. ${errors.join(", ")}`,
-    400
-  );
+  return new AppError(`Validation data error. ${errors.join(", ")}`, 400);
 };
 
-const sendErrorProd = (err, res) => {
+const handleWebTokenExpiredError = (error) => {
+  const message = "Token Expired. Please login again.";
+  return new AppError(message, 401);
+};
+
+const handleWebTokenError = (error) => {
+  const message = "Invalid web token. Please login and retry";
+  return new AppError(message, 401);
+};
+
+const sendErrorDev = (err, req, res) => {
+  if (req.originalUrl.startsWith("/api")) {
+    res.status(err.statusCode).json({
+      status: err.status,
+      error: err,
+      message: err.message,
+      stack: err.stack,
+    });
+  } else {
+    console.log(err);
+    res
+      .status(err.statusCode)
+      .set(
+        "Content-Security-Policy",
+        "default-src 'self' https://*.mapbox.com ;base-uri 'self';block-all-mixed-content;font-src 'self' https: data:;frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src https://cdnjs.cloudflare.com https://api.mapbox.com 'self' blob: ;script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests;"
+      )
+      .render("error", {
+        title: "Something went wrong!",
+        msg: err.message,
+      });
+  }
+};
+
+const sendErrorProd = (err, req, res) => {
   if (err.isOperational) {
     res.status(err.statusCode).json({
       status: err.status,
@@ -34,26 +62,6 @@ const sendErrorProd = (err, res) => {
       message: "Something went very wrong!",
     });
   }
-};
-
-const handleWebTokenExpiredError = (error) => {
-  const message = "Token Expired. Please login again.";
-  return new AppError(message, 401);
-};
-
-const handleWebTokenError = (error) => {
-  const message =
-    "Invalid web token. Please login and retry";
-  return new AppError(message, 401);
-};
-
-const sendErrorDev = (err, res) => {
-  res.status(err.statusCode).json({
-    status: err.status,
-    message: err.message,
-    error: err,
-    statusCode: err.statusCode,
-  });
 };
 
 module.exports = (err, req, res, next) => {
@@ -77,9 +85,9 @@ module.exports = (err, req, res, next) => {
     if (err.name === "TokenExpiredError") {
       error = handleWebTokenExpiredError(error);
     }
-    sendErrorProd(error, res);
+    sendErrorProd(error, req, res);
   } else if (process.env.NODE_ENV === "development") {
-    sendErrorDev(err, res);
+    sendErrorDev(err, req, res);
   }
   next();
 };
