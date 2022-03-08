@@ -2,6 +2,72 @@ const Tour = require("../models/tourModel");
 const catchAsync = require("./../utils/catchAsync");
 const AppError = require("./../utils/appError");
 const FactoryHandler = require("./factoryHandler");
+const multer = require("multer");
+const sharp = require("sharp");
+
+// Created memory buffer
+const multerStorage = multer.memoryStorage();
+
+// Created multer filter
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith("image")) {
+    cb(null, true);
+  } else {
+    cb(new AppError("Please upload an image file", 400), false);
+  }
+};
+
+// Upload object
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
+
+exports.uploadTourPhotos = upload.fields([
+  { name: "imageCover", maxCount: 1 },
+  { name: "images", maxCount: 3 },
+]);
+
+exports.resizeTourImages = catchAsync(async (req, res, next) => {
+  if (!req.files.imageCover || !req.files.images) return next();
+  console.log("resize images");
+
+  if (req.files.imageCover) {
+    const imageCover = `tour-${
+      req.params.id
+    }-${Date.now()}-cover.jpeg`;
+    // Cover image
+    await sharp(req.files.imageCover[0].buffer)
+      .resize(2000, 1333)
+      .toFormat("jpeg")
+      .jpeg({ quality: 90 })
+      .toFile(`public/img/tours/${imageCover}`);
+
+    req.body.imageCover = imageCover;
+  }
+
+  if (req.files.images) {
+    // images
+    req.body.images = [];
+
+    await Promise.all(
+      req.files.images.map(async (image, i) => {
+        const fileName = `tour-${req.params.id}-${Date.now()}-${
+          i + 1
+        }.jpeg`;
+        await sharp(image.buffer)
+          .resize(2000, 1333)
+          .toFormat("jpeg")
+          .toFile(`public/img/tours/${fileName}`);
+        req.body.images.push(fileName);
+      })
+    );
+  }
+
+  console.log(req.body);
+
+  next();
+});
 
 exports.getTours = FactoryHandler.getAll(Tour);
 exports.getTour = FactoryHandler.getOne(Tour, {
@@ -15,7 +81,8 @@ exports.deleteTour = FactoryHandler.deleteOne(Tour);
 exports.getToursWithin = catchAsync(async (req, res, next) => {
   const { distance, latlng, unit } = req.params;
   const [lat, lng] = latlng.split(",");
-  const radius = unit === "mi" ? distance / 3963.2 : distance / 6378.1;
+  const radius =
+    unit === "mi" ? distance / 3963.2 : distance / 6378.1;
 
   if (!lat || !lng) {
     next(

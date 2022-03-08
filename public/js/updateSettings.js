@@ -5,22 +5,34 @@ const formPassword = document.getElementById("password-form");
 
 form.addEventListener("submit", function (e) {
   e.preventDefault();
-  const name = document.getElementById("name").value;
-  const email = document.getElementById("email").value;
-  updateData({ name, email }, "data");
+
+  const form = new FormData();
+  form.append("name", document.getElementById("name").value);
+  form.append("email", document.getElementById("email").value);
+  form.append("photo", document.getElementById("photo").files[0]);
+  updateData(form, "data");
 });
 
 formPassword.addEventListener("submit", async function (e) {
   e.preventDefault();
-  const passwordCurrent = document.getElementById("password-current").value;
+  const passwordCurrent = document.getElementById(
+    "password-current"
+  ).value;
   const password = document.getElementById("password").value;
-  const passwordConfirm = document.getElementById("password-confirm").value;
+  const passwordConfirm = document.getElementById(
+    "password-confirm"
+  ).value;
 
-  document.querySelector(".btn-password-update").innerHTML = "Updating...";
+  document.querySelector(".btn-password-update").innerHTML =
+    "Updating...";
 
-  await updateData({ passwordCurrent, password, passwordConfirm }, "password");
+  await updateData(
+    { passwordCurrent, password, passwordConfirm },
+    "password"
+  );
 
-  document.querySelector(".btn-password-update").innerHTML = "SAVE PASSWORD";
+  document.querySelector(".btn-password-update").innerHTML =
+    "SAVE PASSWORD";
 
   document.getElementById("password-current").value = "";
   document.getElementById("password").value = "";
@@ -61,6 +73,8 @@ const hideNotification = () => {
 const showNotification = (type, msg) => {
   hideNotification();
   const markup = `<div class="alert alert--${type}">${msg}</div>`;
-  document.querySelector("body").insertAdjacentHTML("afterbegin", markup);
+  document
+    .querySelector("body")
+    .insertAdjacentHTML("afterbegin", markup);
   window.setTimeout(hideNotification, 1000);
 };
