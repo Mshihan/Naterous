@@ -72,10 +72,7 @@ exports.getAll = (Model) =>
     if (req.params.tourId) filter = { tour: req.params.tourId };
 
     // Execute Query
-    const features = new ApiFeatures(
-      Model.find(filter),
-      req.query
-    )
+    const features = new ApiFeatures(Model.find(filter), req.query)
       .filter()
       .sort()
       .fieldLimit()

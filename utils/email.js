@@ -1,5 +1,6 @@
 const nodemailer = require("nodemailer");
 const pug = require("pug");
+const htmlToText = require("html-to-text");
 
 module.exports = class Email {
   constructor(user, url) {
@@ -25,10 +26,15 @@ module.exports = class Email {
     });
   }
 
-  send(template, subject) {
+  async send(template, subject) {
     // Render HTML file based on a pub template
     const html = pug.renderFile(
-      `${__dirname}/../views/emails/${template}.pug`
+      `${__dirname}/../views/emails/${template}.pug`,
+      {
+        firstName: this.firstName,
+        url: this.url,
+        subject,
+      }
     );
 
     // Define mail options
@@ -37,13 +43,15 @@ module.exports = class Email {
       to: this.to,
       subject,
       html,
-      text: options.message,
-      // html
+      text: htmlToText(html),
     };
+
+    // Send mail from transporter
+    await this.newTransport().sendMail(mailOptions);
   }
 
-  sendWelcome() {
-    this.send("welcome", "Welcome to the natours family");
+  async sendWelcome() {
+    await this.send("welcome", "Welcome to the natours family");
   }
 };
 
@@ -63,7 +71,4 @@ const sendEmail = async (options) => {
   };
 
   // 3) Actually send the email
-  await transporter.sendMail(mailOptions);
 };
-
-module.exports = sendEmail;
