@@ -25,4 +25,8 @@ router.get(
   viewController.getAccount
 );
 
+router
+  .route("/my-tours")
+  .get(authController.protected, viewController.getMyTour);
+
 module.exports = router;

@@ -12,7 +12,7 @@ const bookingSchema = new mongoose.Schema({
     required: [true, "Booking must belong to a user"],
   },
   price: {
-    type: number,
+    type: Number,
     required: [true, "Booking must have a price"],
   },
   createdAt: {
@@ -20,18 +20,19 @@ const bookingSchema = new mongoose.Schema({
     default: Date.now(),
   },
   paid: {
-    type: boolean,
+    type: Boolean,
     default: true,
   },
 });
 
 bookingSchema.pre(/^find/, function (next) {
-  this.populate("user").populate({
-    path: "tour",
-    select: "name",
-  });
+  //   this.populate("user").populate({
+  //     path: "tour",
+  //     select: "name",
+  //   });
+  next();
 });
 
-const Booking = mongoose.Model("Booking", bookingSchema);
+const Booking = mongoose.model("Booking", bookingSchema);
 
 module.exports = Booking;
