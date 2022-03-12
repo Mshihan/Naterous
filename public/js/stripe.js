@@ -6,7 +6,6 @@ const bookBtn = document.getElementById("bookTour");
 
 if (bookBtn) {
   bookBtn.addEventListener("click", function (e) {
-    console.log("clicked");
     e.target.textContent = "Processing...";
     const { tourId } = e.target.dataset;
     bookTour(tourId);
@@ -16,7 +15,7 @@ if (bookBtn) {
 const bookTour = async (tourId) => {
   try {
     const session = await axios(
-      `http://localhost:3000/api/v1/bookings/checkout-session/${tourId}`
+      `/api/v1/bookings/checkout-session/${tourId}`
     );
 
     await stripe.redirectToCheckout({

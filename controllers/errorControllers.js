@@ -14,7 +14,10 @@ const handleDuplicateNameErrorDB = (err) => {
 const handleValidationErrorDB = (err) => {
   const errors = Object.values(err.errors).map((el) => el.message);
 
-  return new AppError(`Validation data error. ${errors.join(", ")}`, 400);
+  return new AppError(
+    `Validation data error. ${errors.join(", ")}`,
+    400
+  );
 };
 
 const handleWebTokenExpiredError = (error) => {
@@ -36,7 +39,6 @@ const sendErrorDev = (err, req, res) => {
       stack: err.stack,
     });
   } else {
-    console.log(err);
     res
       .status(err.statusCode)
       .set(

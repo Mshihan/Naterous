@@ -3,48 +3,52 @@ const form = document.getElementById("user-form");
 
 const formPassword = document.getElementById("password-form");
 
-form.addEventListener("submit", function (e) {
-  e.preventDefault();
+if (form) {
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
 
-  const form = new FormData();
-  form.append("name", document.getElementById("name").value);
-  form.append("email", document.getElementById("email").value);
-  form.append("photo", document.getElementById("photo").files[0]);
-  updateData(form, "data");
-});
+    const form = new FormData();
+    form.append("name", document.getElementById("name").value);
+    form.append("email", document.getElementById("email").value);
+    form.append("photo", document.getElementById("photo").files[0]);
+    updateData(form, "data");
+  });
+}
 
-formPassword.addEventListener("submit", async function (e) {
-  e.preventDefault();
-  const passwordCurrent = document.getElementById(
-    "password-current"
-  ).value;
-  const password = document.getElementById("password").value;
-  const passwordConfirm = document.getElementById(
-    "password-confirm"
-  ).value;
+if (formPassword) {
+  formPassword.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const passwordCurrent = document.getElementById(
+      "password-current"
+    ).value;
+    const password = document.getElementById("password").value;
+    const passwordConfirm = document.getElementById(
+      "password-confirm"
+    ).value;
 
-  document.querySelector(".btn-password-update").innerHTML =
-    "Updating...";
+    document.querySelector(".btn-password-update").innerHTML =
+      "Updating...";
 
-  await updateData(
-    { passwordCurrent, password, passwordConfirm },
-    "password"
-  );
+    await updateData(
+      { passwordCurrent, password, passwordConfirm },
+      "password"
+    );
 
-  document.querySelector(".btn-password-update").innerHTML =
-    "SAVE PASSWORD";
+    document.querySelector(".btn-password-update").innerHTML =
+      "SAVE PASSWORD";
 
-  document.getElementById("password-current").value = "";
-  document.getElementById("password").value = "";
-  document.getElementById("password-confirm").value = "";
-});
+    document.getElementById("password-current").value = "";
+    document.getElementById("password").value = "";
+    document.getElementById("password-confirm").value = "";
+  });
+}
 
 const updateData = async (data, type) => {
   try {
     const url =
       type === "data"
-        ? "http://localhost:3000/api/v1/users/updateMe"
-        : "http://localhost:3000/api/v1/users/updateMyPassword";
+        ? "/api/v1/users/updateMe"
+        : "/api/v1/users/updateMyPassword";
 
     const res = await axios({
       method: "PATCH",

@@ -1,14 +1,14 @@
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
+const Tour = require("../models/tourModel");
+const Booking = require("../models/bookingModel");
+const FactoryHandler = require("./factoryHandler");
 const Stripe = require("stripe");
 const stripe = Stripe(
   "sk_test_51Kc5qYGmocYmPMrXCTyZKnZOTcR70z5MpPqgQeGr2csLgu8iU1gJr0eb7lWA4jZCmuHV1h8m2K11oQHm68NiB2Km00h3uKqTMQ"
 );
-const Tour = require("../models/tourModel");
-const Booking = require("../models/bookingModel");
 
 exports.getCheckoutSession = catchAsync(async (req, res, next) => {
-  console.log("executing");
   // 1) Get the currently booked tour
   const tour = await Tour.findById(req.params.tourId);
 
@@ -31,7 +31,6 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
           // `${req.protocol}://${req.get("host")}/img/tours/${
           //   tour.imageCover
           // }`,
-
           `https://www.natours.dev/img/tours/${tour.imageCover}`,
         ],
         amount: tour.price * 100,
@@ -57,3 +56,9 @@ exports.createBookingCheckout = catchAsync(async (req, res, next) => {
 
   res.redirect(req.originalUrl.split("?")[0]);
 });
+
+exports.getAllBooking = FactoryHandler.getAll(Booking);
+exports.getBooking = FactoryHandler.getOne(Booking);
+exports.updateBooking = FactoryHandler.updateOne(Booking);
+exports.createBooking = FactoryHandler.createOne(Booking);
+exports.deleteBooking = FactoryHandler.deleteOne(Booking);
