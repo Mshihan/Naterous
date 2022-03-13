@@ -15,9 +15,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   //   2) create checkout session
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ["card"],
-    success_url: `${req.protocol}://${req.get("host")}/?tour=${
-      req.params.tourId
-    }&user=${req.user.id}&price=${tour.price}`,
+    success_url: `${req.protocol}://${req.get("host")}/my-tours`,
     cancel_url: `${req.protocol}://${req.get("host")}/tour/${
       tour.slug
     }`,
@@ -28,10 +26,9 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
         name: `${tour.name} Tour`,
         description: tour.summary,
         images: [
-          // `${req.protocol}://${req.get("host")}/img/tours/${
-          //   tour.imageCover
-          // }`,
-          `https://www.natours.dev/img/tours/${tour.imageCover}`,
+          `${req.protocol}://${req.get("host")}/img/tours/${
+            tour.imageCover
+          }`,
         ],
         amount: tour.price * 100,
         currency: "usd",
@@ -46,16 +43,16 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.createBookingCheckout = catchAsync(async (req, res, next) => {
-  // Not secure and  [Temporary]
-  const { tour, user, price } = req.query;
+// exports.createBookingCheckout = catchAsync(async (req, res, next) => {
+//   // Not secure and  [Temporary]
+//   const { tour, user, price } = req.query;
 
-  if (!tour && !user && !price) return next();
+//   if (!tour && !user && !price) return next();
 
-  await Booking.create({ tour, user, price });
+//   await Booking.create({ tour, user, price });
 
-  res.redirect(req.originalUrl.split("?")[0]);
-});
+//   res.redirect(req.originalUrl.split("?")[0]);
+// });
 
 exports.getAllBooking = FactoryHandler.getAll(Booking);
 exports.getBooking = FactoryHandler.getOne(Booking);

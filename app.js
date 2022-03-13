@@ -7,6 +7,7 @@ const hpp = require("hpp");
 const cookieParser = require("cookie-parser");
 const helmet = require("helmet");
 const cors = require("cors");
+const checkoutController = require("./controllers/checkoutController");
 const xss = require("xss-clean");
 const mongoSanitizer = require("express-mongo-sanitize");
 const tourRouter = require("./routes/tourRoutes");
@@ -29,11 +30,9 @@ app.set("views", path.join(__dirname, "views"));
 
 app.use(cors());
 
-
 // Setting secure http headers
 app.use(helmet());
 app.options("*", cors());
-
 
 // Check if the server is runing in development or production mode
 // if (process.env.NODE_ENV === "development") {
@@ -47,7 +46,14 @@ const limiter = rateLimit({
   message:
     "Too many requests from this IP. Please try again in an hour",
 });
+
 app.use("/api/", limiter);
+
+app.post(
+  "/webhook",
+  express.row({ type: "application/json" }),
+  checkoutController.checkoutSession
+);
 
 // Compress the file that returns from the server
 app.use(compression());
