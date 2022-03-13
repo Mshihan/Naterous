@@ -11,18 +11,20 @@ exports.checkoutSession = async (req, res) => {
 
   console.log("End points: ", endpointSecret);
 
-  //   let event;
+  let event;
 
-  //   try {
-  //     event = stripe.webhooks.constructEvent(
-  //       req.body,
-  //       signature,
-  //       endpointSecret
-  //     );
-  //   } catch (err) {
-  //     res.status(400).json({ error: "Webhook error" });
-  //     return;
-  //   }
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      signature,
+      endpointSecret
+    );
+    console.log(event);
+  } catch (err) {
+    console.log(err.message);
+    //     res.status(400).json({ error: "Webhook error" });
+    //     return;
+  }
 
   //   if (event.type === "checkout.session.completed") {
   //     const session = event.data.object;
