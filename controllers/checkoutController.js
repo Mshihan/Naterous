@@ -3,31 +3,35 @@ const User = require("../models/userModel");
 const Booking = require("../models/bookingModel");
 
 exports.checkoutSession = async (req, res) => {
+  console.log("checked out");
   const signature = req.headers["stripe-signature"];
+  console.log("signature: ", signature);
 
   const endpointSecret = process.env.STRIPE_WEBHOOK_KEY;
 
-  let event;
+  console.log("End points: ", endpointSecret);
 
-  try {
-    event = stripe.webhooks.constructEvent(
-      req.body,
-      signature,
-      endpointSecret
-    );
-  } catch (err) {
-    res.status(400).json({ error: "Webhook error" });
-    return;
-  }
+  //   let event;
 
-  if (event.type === "checkout.session.completed") {
-    const session = event.data.object;
-    await createBookingCheckout(session);
+  //   try {
+  //     event = stripe.webhooks.constructEvent(
+  //       req.body,
+  //       signature,
+  //       endpointSecret
+  //     );
+  //   } catch (err) {
+  //     res.status(400).json({ error: "Webhook error" });
+  //     return;
+  //   }
 
-    res.status(200).json({ received: true });
-  } else {
-    res.status(400).json({ object: event.data.object });
-  }
+  //   if (event.type === "checkout.session.completed") {
+  //     const session = event.data.object;
+  //     await createBookingCheckout(session);
+
+  //     res.status(200).json({ received: true });
+  //   } else {
+  //     res.status(400).json({ object: event.data.object });
+  //   }
 };
 
 const createBookingCheckout = async (session) => {
