@@ -19,28 +19,26 @@ exports.checkoutSession = async (req, res) => {
       signature,
       endpointSecret
     );
-    console.log(event);
+    // console.log(event);
   } catch (err) {
-    console.log(err.message);
-    //     res.status(400).json({ error: "Webhook error" });
+    // console.log(err.message);
+    res.status(400).json({ error: "Webhook error" });
     //     return;
   }
 
-  //   if (event.type === "checkout.session.completed") {
-  //     const session = event.data.object;
-  //     await createBookingCheckout(session);
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object;
+    await createBookingCheckout(session);
 
-  //     res.status(200).json({ received: true });
-  //   } else {
-  //     res.status(400).json({ object: event.data.object });
-  //   }
+    res.status(200).json({ received: true });
+  }
 };
 
 const createBookingCheckout = async (session) => {
   const tour = session.client_reference_id;
   const user = (await User.findOne({ email: session.customer_email }))
     .id;
-  const price = session.display_items[0].amount / 100;
+  const price = session.amount_total / 100;
 
   await Booking.create({ tour, user, price });
 };
