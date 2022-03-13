@@ -2,7 +2,7 @@ const stripe = require("stripe");
 const User = require("../models/userModel");
 const Booking = require("../models/bookingModel");
 
-exports.checkoutSession = (req, res, next) => {
+exports.checkoutSession = (req, res) => {
   const signature = request.headers["stripe-signature"];
 
   const endpointSecret = process.env.STRIPE_WEBHOOK_KEY;
@@ -15,6 +15,8 @@ exports.checkoutSession = (req, res, next) => {
       signature,
       endpointSecret
     );
+
+    console.log("event");
   } catch (err) {
     res.status(400).json({ error: "Webhook error" });
     return;
