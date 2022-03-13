@@ -6,6 +6,7 @@ const compression = require("compression");
 const hpp = require("hpp");
 const cookieParser = require("cookie-parser");
 const helmet = require("helmet");
+const cors = require("cors");
 const xss = require("xss-clean");
 const mongoSanitizer = require("express-mongo-sanitize");
 const tourRouter = require("./routes/tourRoutes");
@@ -26,8 +27,13 @@ app.set("views", path.join(__dirname, "views"));
 // Express middleware layer
 // ==============================
 
+app.use(cors());
+
+
 // Setting secure http headers
 app.use(helmet());
+app.options("*", cors());
+
 
 // Check if the server is runing in development or production mode
 // if (process.env.NODE_ENV === "development") {
