@@ -26,6 +26,7 @@ exports.checkoutSession = (req, res, next) => {
 
     res.status(200).json({ received: true });
   } else {
+    res.status(400).json({ object: event.data.object });
   }
 };
 
