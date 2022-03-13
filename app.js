@@ -50,7 +50,7 @@ const limiter = rateLimit({
 app.use("/api/", limiter);
 
 app.post(
-  "/webhook",
+  "/webhooks",
   express.raw({ type: "application/json" }),
   checkoutController.checkoutSession
 );
