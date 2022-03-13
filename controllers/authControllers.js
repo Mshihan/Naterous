@@ -12,7 +12,7 @@ const signToken = (id) => {
   });
 };
 
-const sendCreateToken = (user, statusCode, res) => {
+const sendCreateToken = (user, statusCode, req, res) => {
   const token = signToken(user._id);
 
   const cookieObj = {
@@ -21,11 +21,13 @@ const sendCreateToken = (user, statusCode, res) => {
         process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
     ),
     httpOnly: true,
+    secure:
+      req.secure || req.headers["x-forwarded-proto"] === "https",
   };
 
-  if (process.env.NODE_ENV === "production") {
-    cookieObj.secure = true;
-  }
+  // if (req.secure || req.headers["x-forwarded-proto"] === "https") {
+  //   cookieObj.secure = true;
+  // }
 
   res.cookie("jwt", token, cookieObj);
 
@@ -53,7 +55,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   });
   const url = `${req.protocol}://${req.get("host")}/me`;
   await new Email(newUser, url).sendWelcome();
-  sendCreateToken(newUser, 200, res);
+  sendCreateToken(newUser, 200, req, res);
 });
 
 // Can't execute the next method after sending the response.
@@ -81,7 +83,7 @@ exports.login = catchAsync(async (req, res, next) => {
 
   // 3) if everything is ok, send the json web token
 
-  sendCreateToken(user, 200, res);
+  sendCreateToken(user, 200, req, res);
 });
 
 exports.protected = catchAsync(async (req, res, next) => {
@@ -251,7 +253,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   await user.save();
 
   // 4) Log the user in, send JWT
-  sendCreateToken(user, 200, res);
+  sendCreateToken(user, 200, req, res);
 });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
@@ -279,7 +281,7 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   await user.save();
 
   // 4) Log user in, send JWT token
-  sendCreateToken(user, 200, res);
+  sendCreateToken(user, 200, req, res);
 });
 
 exports.logout = (req, res) => {
