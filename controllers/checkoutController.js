@@ -12,7 +12,7 @@ exports.checkoutSession = (req, res, next) => {
   try {
     event = stripe.webhooks.constructEvent(
       req.body,
-      sig,
+      signature,
       endpointSecret
     );
   } catch (err) {
