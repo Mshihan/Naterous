@@ -51,7 +51,7 @@ app.use("/api/", limiter);
 
 app.post(
   "/webhook",
-  express.row({ type: "application/json" }),
+  express.raw({ type: "application/json" }),
   checkoutController.checkoutSession
 );
 
